@@ -22,9 +22,9 @@ from datetime import timedelta
 app = FastAPI(title="GlobalPulse24 Backend API", version="1.0.0")
 
 # CORS Configuration
-# Allow frontend URL from environment variable, fallback to wildcard
+# 1. FIX CORS: This allows your specific website to talk to Railway
 origins = [
-    "*"
+    "https://www.globalpulse24.in"
 ]
 
 app.add_middleware(
