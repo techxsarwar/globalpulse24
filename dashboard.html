@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Publisher Dashboard - GlobalPulse24">
+    <title>Publisher Dashboard - GlobalPulse24</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="main-sidebar">
+            <div class="sidebar-header">
+                <span class="logo-text">Global<span class="text-primary">Pulse</span>24</span>
+                <span class="dashboard-title">Publisher</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#upload-panel" class="sidebar-link active" id="link-upload">Upload News</a>
+                <a href="#" class="sidebar-link" id="link-articles">My Articles</a>
+                <a href="#earnings-panel" class="sidebar-link" id="link-earnings">Earnings</a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="index.html" class="sidebar-link" id="link-back-home">Back to Home</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="topbar">
+                <h1 class="page-title">Dashboard Overview</h1>
+                <div class="user-profile">
+                    <span class="agency-name">TechPulse Agency</span>
+                    <div class="avatar bg-gray text-primary">TP</div>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                <!-- Earnings Section -->
+                <section class="earnings-section" id="earnings-panel">
+                    <h2 class="section-title">Earnings</h2>
+                    <div class="earnings-grid">
+                        <div class="earning-card">
+                            <h3 class="earning-label">Total Revenue</h3>
+                            <div class="earning-value text-primary">$12,450.00</div>
+                            <p class="earning-subtext">+15% from last month</p>
+                        </div>
+                        <div class="earning-card">
+                            <h3 class="earning-label">Pending Payments</h3>
+                            <div class="earning-value text-primary">$3,200.00</div>
+                            <p class="earning-subtext" style="color: var(--text-secondary);">Estimated payout: Nov 1</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- News Upload Form -->
+                <section class="upload-section" id="upload-panel">
+                    <h2 class="section-title">Publish New Article</h2>
+                    <form class="upload-form" id="news-form" onsubmit="event.preventDefault();">
+                        <div class="form-group">
+                            <label for="headline" class="form-label">Headline</label>
+                            <input type="text" id="headline" class="form-input"
+                                placeholder="Enter an engaging headline..." required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="category" class="form-label">Category</label>
+                            <select id="category" class="form-input" required>
+                                <option value="" disabled selected>Select a category</option>
+                                <option value="world">World</option>
+                                <option value="politics">Politics</option>
+                                <option value="tech">Tech</option>
+                                <option value="local">Local</option>
+                                <option value="economy">Economy</option>
+                                <option value="arts">Arts & Culture</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="image-upload" class="form-label">Image Upload</label>
+                            <div class="file-upload-wrapper">
+                                <input type="file" id="image-upload" class="file-input" accept="image/*" required>
+                                <div class="file-drop-area">
+                                    <span class="file-msg">Click to upload or drag & drop an image here</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="article-body" class="form-label">Article Body</label>
+                            <textarea id="article-body" class="form-textarea"
+                                placeholder="Write your news story here..." required></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary">Save Draft</button>
+                            <button type="submit" class="btn btn-primary" id="btn-publish-article">Publish
+                                Article</button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>
