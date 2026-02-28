@@ -21,15 +21,10 @@ from datetime import timedelta
 
 app = FastAPI(title="GlobalPulse24 Backend API", version="1.0.0")
 
-# CORS Configuration
 # 1. FIX CORS: This allows your specific website to talk to Railway
-origins = [
-    "https://www.globalpulse24.in"
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["https://www.globalpulse24.in"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -62,9 +57,10 @@ async def startup_db_client():
         })
         print("Created default admin user: yash / admin123")
 
-# Authentication Routes
+# 2. FIX 404: Create the missing /token endpoint
 @app.post("/token", response_model=Token)
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db = Depends(get_database)):
+async def login(form_data: OAuth2PasswordRequestForm = Depends(), db = Depends(get_database)):
+    # Add your logic to check MongoDB for the user here
     user = await db["users"].find_one({"username": form_data.username})
     if not user or not verify_password(form_data.password, user["hashed_password"]):
         raise HTTPException(
