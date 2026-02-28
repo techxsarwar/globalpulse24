@@ -1,12 +1,13 @@
-from motor.motor_asyncio import AsyncIOMotorClient
 import os
+from motor.motor_asyncio import AsyncIOMotorClient
 
-# Default local MongoDB connection if URI is not provided in env
-MONGO_DETAILS = os.getenv("MONGO_DETAILS", "mongodb://mongo:YNRDRPcciIxZlVZJYVTMaeMwbXZYGqBj@mongodb.railway.internal:27017")
-DATABASE_NAME = os.getenv("DATABASE_NAME", "globalpulse24")
+# Get the secret URL from Railway's environment
+MONGO_URL = os.getenv("MONGO_URL")
 
-client = AsyncIOMotorClient(MONGO_DETAILS)
-database = client[DATABASE_NAME]
+# Initialize the MongoDB client
+client = AsyncIOMotorClient(MONGO_URL)
+db = client.GlobalPulse24
+news_collection = db.get_collection("articles")
 
 def get_database():
-    return database
+    return db
