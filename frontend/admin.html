@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Approval - GlobalPulse24</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-red: #D90429;
+            --white: #FFFFFF;
+            --light-gray: #F8F9FA;
+            --dark-text: #2B2D42;
+            --success-green: #28a745;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-gray);
+            margin: 0;
+            padding: 0;
+            color: var(--dark-text);
+        }
+
+        header {
+            background-color: var(--white);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .logo span {
+            color: var(--primary-red);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        h1 {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .auth-section {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        input[type="password"] {
+            padding: 0.75rem;
+            width: 200px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 1rem;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--white);
+        }
+
+        .btn-auth {
+            background-color: var(--dark-text);
+        }
+
+        .btn-auth:hover {
+            opacity: 0.9;
+        }
+
+        .card {
+            background-color: var(--white);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid var(--primary-red);
+        }
+
+        .card-content h3 {
+            margin: 0 0 0.5rem 0;
+            color: var(--primary-red);
+        }
+
+        .card-content p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-approve {
+            background-color: var(--success-green);
+        }
+
+        .btn-approve:hover {
+            background-color: #218838;
+        }
+
+        .btn-reject {
+            background-color: var(--primary-red);
+        }
+
+        .btn-reject:hover {
+            background-color: #c90022;
+        }
+
+        #news-list {
+            display: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #6c757d;
+            padding: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">Global<span>Pulse</span>24 Admin</div>
+        <div>Pending Approvals</div>
+    </header>
+
+    <div class="container">
+
+        <div class="auth-section" id="auth-section">
+            <p>Enter the Admin Password to continue:</p>
+            <input type="password" id="admin-password" placeholder="Admin Password">
+            <button class="btn-auth" onclick="authenticate()">Access Dashboard</button>
+        </div>
+
+        <div id="news-list">
+            <h1>Pending News Articles</h1>
+            <div id="articles-container">
+                <!-- Cards injected here via JS -->
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const API_BASE = "http://localhost:8000";
+        let adminPassword = "";
+
+        function authenticate() {
+            const pwdInput = document.getElementById('admin-password').value;
+            if (!pwdInput) return alert("Please enter the password");
+            adminPassword = pwdInput;
+            fetchPendingArticles();
+        }
+
+        async function fetchPendingArticles() {
+            try {
+                const response = await fetch(`${API_BASE}/admin/pending`, {
+                    headers: { 'X-Admin-Token': adminPassword }
+                });
+
+                if (response.status === 403) {
+                    alert('Invalid Admin Password');
+                    adminPassword = "";
+                    return;
+                }
+
+                if (!response.ok) throw new Error('Failed to fetch');
+
+                const articles = await response.json();
+
+                document.getElementById('auth-section').style.display = 'none';
+                document.getElementById('news-list').style.display = 'block';
+
+                renderArticles(articles);
+            } catch (error) {
+                console.error(error);
+                alert("Error connecting to server.");
+            }
+        }
+
+        function renderArticles(articles) {
+            const container = document.getElementById('articles-container');
+            container.innerHTML = '';
+
+            if (articles.length === 0) {
+                container.innerHTML = '<div class="empty-state">No pending articles found.</div>';
+                return;
+            }
+
+            articles.forEach(article => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-content">
+                        <h3>${article.title}</h3>
+                        <p>By ${article.author}</p>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn-approve" onclick="approveArticle('${article.id}')">Approve</button>
+                        <button class="btn-reject" onclick="rejectArticle('${article.id}')">Reject</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        async function approveArticle(id) {
+            try {
+                const response = await fetch(`${API_BASE}/admin/approve/${id}`, {
+                    method: 'PUT',
+                    headers: { 'X-Admin-Token': adminPassword }
+                });
+
+                if (response.ok) {
+                    alert('Article Approved!');
+                    fetchPendingArticles(); // Refresh list
+                } else {
+                    alert('Failed to approve article');
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Error processing approval.");
+            }
+        }
+
+        async function rejectArticle(id) {
+            alert(`Reject logic for ${id} goes here. Setting status to rejected is not explicitly defined in the API yet so simulating action.`);
+            // In a real scenario, we would trigger a PUT /admin/reject/{id}
+            fetchPendingArticles(); // Refresh list
+        }
+
+    </script>
+</body>
+
+</html>

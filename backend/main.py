@@ -15,6 +15,8 @@ from auth import (
     get_current_user,
     ACCESS_TOKEN_EXPIRE_MINUTES
 )
+import os
+from fastapi.security import APIKeyHeader
 from datetime import timedelta
 
 app = FastAPI(title="GlobalPulse24 Backend API", version="1.0.0")
@@ -35,6 +37,18 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Security for new Admin Routes using ADMIN_PASSWORD
+admin_api_key_header = APIKeyHeader(name="X-Admin-Token", auto_error=False)
+
+def verify_admin_password(api_key_header: str = Depends(admin_api_key_header)):
+    admin_password = os.getenv("ADMIN_PASSWORD", "supersecret123")
+    if api_key_header != admin_password:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid Admin Password"
+        )
+    return True
 
 # Startup event to ensure admin user exists for testing
 @app.on_event("startup")
@@ -96,13 +110,26 @@ async def get_live_news(db = Depends(get_database)):
         articles.append(document)
     return articles
 
+@app.get("/admin/pending", response_model=List[NewsArticleResponse])
+async def get_pending_news(
+    is_admin: bool = Depends(verify_admin_password),
+    db = Depends(get_database)
+):
+    """Admin route to fetch all 'pending' news for approval."""
+    articles = []
+    cursor = db["articles"].find({"status": "pending"}).sort("timestamp", -1)
+    async for document in cursor:
+        document["id"] = str(document["_id"])
+        articles.append(document)
+    return articles
+
 @app.put("/admin/approve/{id}", response_model=NewsArticleResponse)
 async def approve_news(
     id: str, 
-    current_admin: TokenData = Depends(check_admin), 
+    is_admin: bool = Depends(verify_admin_password), 
     db = Depends(get_database)
 ):
-    """Admin route to approve an article, changing status from 'pending' to 'approved'."""
+    """Admin route to approve an article, changing status from 'pending' to 'published'."""
     try:
         obj_id = ObjectId(id)
     except Exception:
@@ -110,7 +137,7 @@ async def approve_news(
 
     result = await db["articles"].update_one(
         {"_id": obj_id},
-        {"$set": {"status": "approved"}}
+        {"$set": {"status": "published"}}
     )
     
     if result.modified_count == 0:
