@@ -21,10 +21,10 @@ from datetime import timedelta
 
 app = FastAPI(title="GlobalPulse24 Backend API", version="1.0.0")
 
-# 1. FIX CORS: This allows your specific website to talk to Railway
+# 1. FIX CORS: This allows your specific website to talk to Railway (Temporarily opened to all origins to fix 405 errors)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://www.globalpulse24.in"], 
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
