@@ -22,12 +22,9 @@ from datetime import timedelta
 app = FastAPI(title="GlobalPulse24 Backend API", version="1.0.0")
 
 # CORS Configuration
-# Allow frontend URL from environment variable, fallback to localhost for testing
+# Allow frontend URL from environment variable, fallback to wildcard
 origins = [
-    "http://localhost",
-    "http://localhost:8080",
-    "http://127.0.0.1:5500",
-    "*" # Replace with specific Vercel URL in production
+    "*"
 ]
 
 app.add_middleware(

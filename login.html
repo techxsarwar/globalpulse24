@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,6 +18,7 @@
             justify-content: center;
             background-color: var(--bg-color);
         }
+
         .login-card {
             background-color: var(--white);
             padding: 3rem;
@@ -25,21 +27,26 @@
             width: 100%;
             max-width: 400px;
         }
+
         .login-header {
             text-align: center;
             margin-bottom: 2rem;
         }
+
         .login-header .logo {
             font-size: 2rem;
             font-weight: 700;
         }
+
         .login-header .text-primary {
             color: var(--primary-color);
         }
+
         .login-subtitle {
             color: var(--text-light);
             margin-top: 0.5rem;
         }
+
         .error-msg {
             color: var(--primary-color);
             background-color: #FEE2E2;
@@ -49,11 +56,13 @@
             font-size: 0.9rem;
             display: none;
         }
+
         .btn-full {
             width: 100%;
         }
     </style>
 </head>
+
 <body>
     <div class="login-container">
         <div class="login-card">
@@ -61,9 +70,9 @@
                 <div class="logo">Global<span class="text-primary">Pulse</span>24</div>
                 <p class="login-subtitle">Sign in to your Publisher/Admin account</p>
             </div>
-            
+
             <div id="error-message" class="error-msg">Invalid credentials</div>
-            
+
             <form id="login-form">
                 <div class="form-group">
                     <label for="username" class="form-label">Username</label>
@@ -87,13 +96,14 @@
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             const errorMsg = document.getElementById('error-message');
-            
+
             try {
                 const formData = new URLSearchParams();
                 formData.append('username', username);
                 formData.append('password', password);
 
-                const response = await fetch('http://localhost:8000/token', {
+                const API_URL = 'https://globalpulse24-production.up.railway.app/token';
+                const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -119,4 +129,5 @@
         });
     </script>
 </body>
+
 </html>
