@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - GlobalPulse24</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: var(--white);
+            border-right: 1px solid #E5E7EB;
+            padding: 2rem 1rem;
+        }
+
+        .sidebar .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            padding-left: 1rem;
+        }
+
+        .sidebar .text-primary {
+            color: var(--primary-color);
+        }
+
+        .nav-items {
+            list-style: none;
+        }
+
+        .nav-items li {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-items a {
+            display: block;
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .nav-items a:hover,
+        .nav-items a.active {
+            background-color: #FEE2E2;
+            color: var(--primary-color);
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 2rem;
+        }
+
+        .panel {
+            display: none;
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.5rem;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid #E5E7EB;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="logo">Global<span class="text-primary">Pulse</span>24 <span id="role-badge"
+                    style="font-size: 0.8rem; background: #E5E7EB; padding: 2px 6px; border-radius: 4px; font-weight: 400;"></span>
+            </div>
+            <ul class="nav-items">
+                <li><a href="#" id="nav-upload" class="active" onclick="switchPanel('upload')">Upload News</a></li>
+                <li id="menu-earnings" style="display:none;"><a href="#" id="nav-earnings"
+                        onclick="switchPanel('earnings')">My Earnings</a></li>
+                <li id="menu-admin" style="display:none;"><a href="#" id="nav-admin"
+                        onclick="switchPanel('admin')">Admin Approval</a></li>
+                <li id="menu-payouts" style="display:none;"><a href="#" id="nav-payouts"
+                        onclick="switchPanel('payouts')">All Payouts</a></li>
+                <li><a href="#" onclick="logout()">Logout</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <!-- Upload Panel -->
+            <div id="panel-upload" class="panel active">
+                <h2>Submit News Article</h2>
+                <div class="card mt-1">
+                    <form id="upload-form">
+                        <div class="form-group">
+                            <label class="form-label">Title</label>
+                            <input type="text" id="article-title" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Category</label>
+                            <input type="text" id="article-category" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Content</label>
+                            <textarea id="article-content" class="form-textarea" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit for Approval</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Earnings Panel -->
+            <div id="panel-earnings" class="panel">
+                <h2>My Earnings</h2>
+                <div class="card mt-1" id="earnings-content">
+                    <!-- Loaded via JS -->
+                </div>
+            </div>
+
+            <!-- Admin Approval Panel -->
+            <div id="panel-admin" class="panel">
+                <h2>Pending Articles</h2>
+                <div class="card mt-1">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pending-articles-list">
+                            <!-- Needs a BE endpoint to fetch pending, mocking approval for now -->
+                            <tr>
+                                <td colspan="4">Fetching manually requires a generic GET /news endpoint. Will input ID
+                                    manually for testing.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div style="margin-top: 2rem;">
+                        <h3>Manual Approve (Test)</h3>
+                        <div class="form-group mt-1">
+                            <input type="text" id="approve-id" class="form-input" placeholder="Article ID">
+                            <button class="btn btn-primary mt-1" onclick="approveArticle()">Approve ID</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Payouts Panel -->
+            <div id="panel-payouts" class="panel">
+                <h2>All Payouts</h2>
+                <div class="card mt-1">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Publisher</th>
+                                <th>Approved Articles</th>
+                                <th>Earnings</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payouts-list">
+                            <!-- Loaded via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        const token = localStorage.getItem('gp24_token');
+
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+
+        // Basic JWT Decode without lib to get role
+        function parseJwt(token) {
+            try {
+                return JSON.parse(atob(token.split('.')[1]));
+            } catch (e) {
+                return null;
+            }
+        }
+
+        const userPayload = parseJwt(token);
+        const role = userPayload ? userPayload.role : 'user';
+        const username = userPayload ? userPayload.sub : 'Publisher';
+
+        document.getElementById('role-badge').textContent = role.toUpperCase();
+
+        if (role === 'admin') {
+            document.getElementById('menu-admin').style.display = 'block';
+            document.getElementById('menu-payouts').style.display = 'block';
+        } else {
+            document.getElementById('menu-earnings').style.display = 'block';
+        }
+
+        function switchPanel(panelId) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-items a').forEach(a => a.classList.remove('active'));
+
+            document.getElementById(`panel-${panelId}`).classList.add('active');
+            document.getElementById(`nav-${panelId}`).classList.add('active');
+
+            if (panelId === 'earnings') fetchEarnings();
+            if (panelId === 'payouts') fetchPayouts();
+        }
+
+        // Add Article
+        document.getElementById('upload-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                title: document.getElementById('article-title').value,
+                category: document.getElementById('article-category').value,
+                content: document.getElementById('article-content').value,
+                author: username
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/news/submit`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    alert('Article submitted successfully!');
+                    e.target.reset();
+                } else alert('Error submitting article');
+            } catch (err) { console.error(err); }
+        });
+
+        // Publisher Earnings
+        async function fetchEarnings() {
+            try {
+                const res = await fetch(`${API_URL}/news/earnings`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                document.getElementById('earnings-content').innerHTML = `
+                    <h3>Total Revenue: $${data.total_revenue || 0}</h3>
+                    <p>Approved Articles: ${data.approved_articles || 0}</p>
+                `;
+            } catch (err) { console.error(err); }
+        }
+
+        // Admin Payouts
+        async function fetchPayouts() {
+            try {
+                const res = await fetch(`${API_URL}/admin/payouts`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.status === 403) return alert('Forbidden');
+                const data = await res.json();
+                const tbody = document.getElementById('payouts-list');
+                tbody.innerHTML = '';
+                data.payouts.forEach(p => {
+                    tbody.innerHTML += `<tr>
+                        <td>${p.publisher}</td>
+                        <td>${p.approved_articles}</td>
+                        <td>$${p.earnings}</td>
+                    </tr>`;
+                });
+            } catch (err) { console.error(err); }
+        }
+
+        // Approve Article
+        async function approveArticle() {
+            const id = document.getElementById('approve-id').value;
+            if (!id) return;
+            try {
+                const res = await fetch(`${API_URL}/admin/approve/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) alert('Approved!');
+                else alert('Error or Forbidden');
+            } catch (err) { console.error(err); }
+        }
+
+        function logout() {
+            localStorage.removeItem('gp24_token');
+            window.location.href = 'login.html';
+        }
+    </script>
+</body>
+
+</html>
